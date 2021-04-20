@@ -26,24 +26,21 @@ class HashTable {
         return static_cast<float>(size()) / static_cast<float>(capacity());
     }
 
-    size_t used_buckets_count() const {
-        return size_+ deleted_count_;
-    }
+    size_t used_buckets_count() const { return size_ + deleted_count_; }
 
     const Bucket *lookup_for_reading(const T &value) {
         if (is_empty()) return nullptr;
 
         auto hash = TraitsForT::hash(value);
         auto bucket_index = hash % capacity_;
-        auto& bucket = buckets_[bucket_index];
+        auto &bucket = buckets_[bucket_index];
 
-        while(true) {
-            if(bucket.used && TraitsForT::equals(bucket, value))
+        while (true) {
+            if (bucket.used && TraitsForT::equals(bucket, value))
                 return &bucket;
 
-            if( !bucket.used && !bucket.deleted)
-                return nullptr;
-            
+            if (!bucket.used && !bucket.deleted) return nullptr;
+
             // We use linear probing here
             bucket_index++;
             bucket_index = bucket_index % capacity_;
