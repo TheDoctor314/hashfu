@@ -1,6 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
+#include <cstdlib>
 
 namespace hashfu {
 
@@ -9,9 +11,15 @@ class HashTable {
     struct Bucket {
         bool used;
         bool deleted;
-        T storage;
+        bool end;
 
-        T* slot() { return &storage; }
+        /*This trick allows us to construct object of type T in this memory
+         *space. To construct an object in this space, use the placement new
+         *syntax. https://isocpp.org/wiki/faq/dtors#placement-new
+         */
+        alignas(T) unsigned char storage[sizeof(T)];
+
+        T* slot() { return static_cast<T*>(storage); }
     };
 
    private:
@@ -36,7 +44,48 @@ class HashTable {
         return false;
     }
 
-    void rehash(size_t new_capacity);
+    void rehash(size_t new_capacity) {
+        new_capacity = std::max(new_capacity, static_cast<size_t>(4));
+
+        auto old_capacity = capacity_;
+        auto* old_buckets = buckets_;
+
+        auto* new_buckets =
+            (Bucket*)std::malloc(sizeof(Bucket) * (new_capacity + 1));
+        if (!new_buckets) {
+            return;
+        }
+        __builtin_memset(new_buckets, 0, sizeof(Bucket) * (new_capacity + 1));
+
+        buckets_ = new_buckets;
+        capacity_ = new_capacity;
+        deleted_count_ = 0;
+
+        // sentinel pointer to mark end of line
+        buckets_[capacity_].end = true;
+
+        if (!old_buckets) return;
+
+        for (int i = 0; i < old_capacity; i++) {
+            // move from old table to new
+            auto& old_bucket = old_buckets[i];
+
+            // We insert only used objects, not deleted objects
+            if (old_bucket.used) {
+                insert_during_rehash(*old_bucket.slot());
+                old_bucket.slot->~T();
+            }
+        }
+    }
+
+    void insert_during_rehash(T& val) {
+        auto& bucket = lookup_for_writing(val);
+
+        /* We use the placement new syntax. This allows us to
+         * provide the address where the object should be constructed.*/
+        new (bucket.slot()) T(val);
+        bucket.used = true;
+    }
 
     const Bucket* lookup_for_reading(const T& value) {
         if (is_empty()) return nullptr;
