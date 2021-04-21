@@ -57,6 +57,33 @@ class HashTable {
         }
     }
 
+    Bucket& lookup_for_writing(const T& value) {
+        if (should_grow()) {
+            rehash(capacity() * 2);
+        }
+
+        auto hash = TraitsForT::hash(value);
+        auto bucket_index = hash % capacity_;
+
+        /*We need to return the first empty bucket we come across or the bucket
+        which needs to be replaced*/
+        Bucket* first_empty_bucket = nullptr;
+        while (true) {
+            auto& bucket = buckets_[bucket_index];
+
+            if (bucket.used && TraitsForT::equals(*bucket.slot(), value))
+                return bucket;
+
+            if (!bucket.used) {
+                if (!first_empty_bucket) first_empty_bucket = &bucket;
+
+                if (!bucket.deleted) return *first_empty_bucket;
+            }
+
+            bucket_index = (bucket_index + 1) % capacity_;
+        }
+    }
+
    public:
     HashTable() = default;
 };
