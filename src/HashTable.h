@@ -10,10 +10,12 @@ class HashTable {
         bool used;
         bool deleted;
         T storage;
+
+        T* slot() { return &storage; }
     };
 
    private:
-    Bucket *buckets_{nullptr};
+    Bucket* buckets_{nullptr};
     size_t size_{0};
     size_t deleted_count_{0};
     size_t capacity_{0};
@@ -27,16 +29,24 @@ class HashTable {
     }
 
     size_t used_buckets_count() const { return size_ + deleted_count_; }
+    bool should_grow() const {
+        if (used_buckets_count() >= capacity()) {
+            return true;
+        }
+        return false;
+    }
 
-    const Bucket *lookup_for_reading(const T &value) {
+    void rehash(size_t new_capacity);
+
+    const Bucket* lookup_for_reading(const T& value) {
         if (is_empty()) return nullptr;
 
         auto hash = TraitsForT::hash(value);
         auto bucket_index = hash % capacity_;
-        auto &bucket = buckets_[bucket_index];
+        auto& bucket = buckets_[bucket_index];
 
         while (true) {
-            if (bucket.used && TraitsForT::equals(bucket, value))
+            if (bucket.used && TraitsForT::equals(*bucket.slot(), value))
                 return &bucket;
 
             if (!bucket.used && !bucket.deleted) return nullptr;
