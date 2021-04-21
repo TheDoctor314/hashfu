@@ -6,6 +6,8 @@
 
 namespace hashfu {
 
+enum class HashTableResult { InsertedNewEntry, ReplacedExistingEntry };
+
 template <typename T, typename TraitsForT>
 class HashTable {
     struct Bucket {
@@ -19,7 +21,7 @@ class HashTable {
          */
         alignas(T) unsigned char storage[sizeof(T)];
 
-        T* slot() { return static_cast<T*>(storage); }
+        T* slot() { return reinterpret_cast<T*>(storage); }
     };
 
    private:
@@ -66,14 +68,14 @@ class HashTable {
 
         if (!old_buckets) return;
 
-        for (int i = 0; i < old_capacity; i++) {
+        for (size_t i = 0; i < old_capacity; i++) {
             // move from old table to new
             auto& old_bucket = old_buckets[i];
 
             // We insert only used objects, not deleted objects
             if (old_bucket.used) {
                 insert_during_rehash(*old_bucket.slot());
-                old_bucket.slot->~T();
+                old_bucket.slot()->~T();
             }
         }
 
