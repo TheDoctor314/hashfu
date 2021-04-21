@@ -76,6 +76,8 @@ class HashTable {
                 old_bucket.slot->~T();
             }
         }
+
+        std::free(old_buckets);
     }
 
     void insert_during_rehash(T& val) {
