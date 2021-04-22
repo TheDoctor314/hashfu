@@ -8,6 +8,37 @@ namespace hashfu {
 
 enum class HashTableResult { InsertedNewEntry, ReplacedExistingEntry };
 
+template <typename HashTableType, typename T, typename Bucket>
+class HashTableIterator {
+   private:
+    Bucket* bucket_{nullptr};  // points to the current bucket
+
+   public:
+    // Basic operator overloads required by any iterator
+    bool operator==(const HashTableIterator& rhs) {
+        return bucket_ == rhs.bucket_;
+    }
+    bool operator!=(const HashTableIterator& rhs) {
+        return bucket_ != rhs.bucket_;
+    }
+    T& operator*() { return *bucket_->slot(); }
+    T* operator->() { return bucket_->slot(); }
+
+    void operator++() { next_used_bucket(); }
+
+   private:
+    void next_used_bucket() {
+        if (!bucket_) return;
+
+        do {
+            ++bucket_;
+            if (bucket_->used) return;
+        } while (!bucket_->end);
+
+        if (!bucket_->end) bucket_ = nullptr;
+    }
+};
+
 template <typename T, typename TraitsForT>
 class HashTable {
     struct Bucket {
