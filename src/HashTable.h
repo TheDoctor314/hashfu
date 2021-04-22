@@ -62,13 +62,6 @@ class HashTable {
     size_t capacity_{0};
 
    private:
-    bool is_empty() const { return size_ == 0; }
-    size_t size() const { return size_; }
-    size_t capacity() const { return capacity_; }
-    float load_factor() const {
-        return static_cast<float>(size()) / static_cast<float>(capacity());
-    }
-
     size_t used_buckets_count() const { return size_ + deleted_count_; }
     bool should_grow() const {
         if (used_buckets_count() >= capacity()) {
@@ -208,6 +201,13 @@ class HashTable {
         std::swap(deleted_count_, other.deleted_count_);
         std::swap(buckets_, other.buckets_);
         return *this;
+    }
+
+    bool is_empty() const { return size_ == 0; }
+    size_t size() const { return size_; }
+    size_t capacity() const { return capacity_; }
+    float load_factor() const {
+        return static_cast<float>(size()) / static_cast<float>(capacity());
     }
 };
 }  // namespace hashfu
