@@ -45,6 +45,8 @@ class HashTableIterator {
 
 template <typename T, typename TraitsForT>
 class HashTable {
+    static constexpr size_t load_factor_percent = 60;
+
     struct Bucket {
         bool used;
         bool deleted;
@@ -68,10 +70,8 @@ class HashTable {
    private:
     size_t used_buckets_count() const { return size_ + deleted_count_; }
     bool should_grow() const {
-        if (used_buckets_count() >= capacity()) {
-            return true;
-        }
-        return false;
+        return ((used_buckets_count() + 1) * 100) >=
+               (capacity_ * load_factor_percent);
     }
 
     void rehash(size_t new_capacity) {
@@ -210,7 +210,7 @@ class HashTable {
     // NOTE: Debug function
     void print() {
         for (size_t i = 0; i < capacity_; ++i) {
-            std::cerr << i <<": " << *buckets_[i].slot() << '\n';
+            std::cerr << i << ": " << *buckets_[i].slot() << '\n';
         }
     }
 
@@ -218,7 +218,8 @@ class HashTable {
     size_t size() const { return size_; }
     size_t capacity() const { return capacity_; }
     float load_factor() const {
-        return static_cast<float>(size()) / static_cast<float>(capacity());
+        return static_cast<float>(used_buckets_count()) /
+               static_cast<float>(capacity());
     }
 
     //  Implement iterator functions
