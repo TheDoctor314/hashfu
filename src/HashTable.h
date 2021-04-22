@@ -170,5 +170,44 @@ class HashTable {
 
    public:
     HashTable() = default;
+    explicit HashTable(size_t capacity) { rehash(capacity); }
+
+    ~HashTable() {
+        if (!buckets_) return;
+
+        // iterate through array, destroying each object
+        for (size_t i = 0; i < capacity_; ++i) {
+            if (buckets_[i].used) {
+                buckets_[i].slot()->~T();
+            }
+        }
+
+        std::free(buckets_);
+    }
+
+    // copy constructor
+    HashTable(const HashTable& other) {
+        rehash(other.capacity());
+
+        /* TODO: iterate through other and set each element.
+         * This requires implementing iterators.*/
+    }
+
+    // move constructor
+    HashTable(HashTable&& other) noexcept
+        : size_(other.size_),
+          capacity_(other.capacity_),
+          buckets_(other.buckets_),
+          deleted_count_(other.deleted_count_) {
+        other.buckets_ = nullptr;
+    }
+    // move assignment
+    HashTable& operator=(HashTable&& other) noexcept {
+        std::swap(capacity_, other.capacity_);
+        std::swap(size_, other.size_);
+        std::swap(deleted_count_, other.deleted_count_);
+        std::swap(buckets_, other.buckets_);
+        return *this;
+    }
 };
 }  // namespace hashfu
