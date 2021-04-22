@@ -10,6 +10,8 @@ enum class HashTableResult { InsertedNewEntry, ReplacedExistingEntry };
 
 template <typename HashTableType, typename T, typename Bucket>
 class HashTableIterator {
+    friend HashTableType;
+
    private:
     Bucket* bucket_{nullptr};  // points to the current bucket
 
@@ -35,8 +37,10 @@ class HashTableIterator {
             if (bucket_->used) return;
         } while (!bucket_->end);
 
-        if (!bucket_->end) bucket_ = nullptr;
+        if (bucket_->end) bucket_ = nullptr;
     }
+
+    explicit HashTableIterator(Bucket* bucket) : bucket_(bucket) {}
 };
 
 template <typename T, typename TraitsForT>
@@ -203,11 +207,64 @@ class HashTable {
         return *this;
     }
 
+    // NOTE: Debug function
+    void print() {
+        for (size_t i = 0; i < capacity_; ++i) {
+            std::cerr << i <<": " << *buckets_[i].slot() << '\n';
+        }
+    }
+
     bool is_empty() const { return size_ == 0; }
     size_t size() const { return size_; }
     size_t capacity() const { return capacity_; }
     float load_factor() const {
         return static_cast<float>(size()) / static_cast<float>(capacity());
+    }
+
+    //  Implement iterator functions
+    using Iterator = HashTableIterator<HashTable, T, Bucket>;
+    Iterator begin() {
+        for (size_t i = 0; i < capacity_; ++i) {
+            if (buckets_[i].used) return Iterator(&buckets_[i]);
+        }
+
+        return end();
+    }
+    Iterator end() { return Iterator(nullptr); }
+
+    using ConstIterator =
+        HashTableIterator<const HashTable, const T, const Bucket>;
+    ConstIterator begin() const {
+        for (size_t i = 0; i < capacity_; ++i) {
+            if (buckets_[i].used) return ConstIterator(&buckets_[i]);
+        }
+
+        return end();
+    }
+    ConstIterator end() const { return ConstIterator(nullptr); }
+
+    void clear() { *this = HashTable(); }
+
+    /* TODO: Take a forwarding reference for insert and
+     * forward it to the constructor of T*/
+    HashTableResult insert(const T& value) {
+        auto& bucket = lookup_for_writing(value);
+
+        if (bucket.used) {
+            *bucket.slot() = value;
+            return HashTableResult::ReplacedExistingEntry;
+        }
+
+        new (bucket.slot()) T(value);
+        bucket.used = true;
+        if (bucket.deleted) {
+            // if we are reusing a deleted entry, decrease count
+            bucket.deleted = false;
+            --deleted_count_;
+        }
+
+        ++size_;
+        return HashTableResult::InsertedNewEntry;
     }
 };
 }  // namespace hashfu
