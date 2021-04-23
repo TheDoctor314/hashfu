@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
+#include <iostream>
 
 namespace hashfu {
 
@@ -186,8 +187,9 @@ class HashTable {
     HashTable(const HashTable& other) {
         rehash(other.capacity());
 
-        /* TODO: iterate through other and set each element.
-         * This requires implementing iterators.*/
+        for (const auto& i : other) {
+            insert(i);
+        }
     }
 
     // move constructor
