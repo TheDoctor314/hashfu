@@ -195,6 +195,14 @@ class HashTable {
             insert(i);
         }
     }
+    // copy assignment
+    HashTable& operator=(const HashTable& other) {
+        if (this != &other) {
+            HashTable temp(other);
+            swap(*this, temp);
+        }
+        return *this;
+    }
 
     // move constructor
     HashTable(HashTable&& other) noexcept
@@ -206,11 +214,15 @@ class HashTable {
     }
     // move assignment
     HashTable& operator=(HashTable&& other) noexcept {
-        std::swap(capacity_, other.capacity_);
-        std::swap(size_, other.size_);
-        std::swap(deleted_count_, other.deleted_count_);
-        std::swap(buckets_, other.buckets_);
+        swap(*this, other);
         return *this;
+    }
+
+    void swap(HashTable& a, HashTable& b) noexcept {
+        std::swap(a.capacity_, b.capacity_);
+        std::swap(a.size_, b.size_);
+        std::swap(a.deleted_count_, b.deleted_count_);
+        std::swap(a.buckets_, b.buckets_);
     }
 
     // NOTE: Debug function
@@ -275,6 +287,8 @@ class HashTable {
             return TraitsForT::equals(entry, value);
         });
     }
+
+    bool contains(const T& value) const { return find(value) != end(); }
 
     /* TODO: Take a forwarding reference for insert and
      * forward it to the constructor of T*/
