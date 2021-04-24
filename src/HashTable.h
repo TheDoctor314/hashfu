@@ -256,6 +256,26 @@ class HashTable {
 
     void clear() { *this = HashTable(); }
 
+    template <typename Pred>
+    Iterator find(unsigned hash, Pred predicate) {
+        return Iterator(lookup_with_hash(hash, predicate));
+    }
+    template <typename Pred>
+    ConstIterator find(unsigned hash, Pred predicate) const {
+        return ConstIterator(lookup_with_hash(hash, predicate));
+    }
+
+    Iterator find(const T& value) {
+        return find(TraitsForT::hash(value), [&value](auto& entry) {
+            return TraitsForT::equals(entry, value);
+        });
+    }
+    ConstIterator find(const T& value) const {
+        return find(TraitsForT::hash(value), [&value](auto& entry) {
+            return TraitsForT::equals(entry, value);
+        });
+    }
+
     /* TODO: Take a forwarding reference for insert and
      * forward it to the constructor of T*/
     HashTableResult insert(const T& value) {
@@ -276,6 +296,29 @@ class HashTable {
 
         ++size_;
         return HashTableResult::InsertedNewEntry;
+    }
+
+    void remove(Iterator iter) {
+        assert(iter.bucket_);
+        auto& bucket = *iter.bucket_;
+        assert(bucket.used);
+        assert(!bucket.deleted);
+        assert(!bucket.end);
+
+        bucket.slot()->~T();
+        bucket.used = false;
+        bucket.deleted = true;
+        --size_;
+        ++deleted_count_;
+    }
+    bool remove(const T& value) {
+        auto it = find(value);
+        if (it != end()) {
+            remove(it);
+            return true;
+        }
+
+        return false;
     }
 };
 }  // namespace hashfu
