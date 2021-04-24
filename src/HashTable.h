@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -120,23 +121,26 @@ class HashTable {
         bucket.used = true;
     }
 
-    const Bucket* lookup_for_reading(const T& value) {
+    template <typename Pred>
+    Bucket* lookup_with_hash(unsigned hash, Pred predicate) {
         if (is_empty()) return nullptr;
 
-        auto hash = TraitsForT::hash(value);
-        auto bucket_index = hash % capacity_;
-        auto& bucket = buckets_[bucket_index];
+        auto index = hash % capacity_;
+        for (;;) {
+            auto& bucket = buckets_[index];
 
-        while (true) {
-            if (bucket.used && TraitsForT::equals(*bucket.slot(), value))
-                return &bucket;
+            if (bucket.used && predicate(*bucket.slot())) return &bucket;
 
             if (!bucket.used && !bucket.deleted) return nullptr;
 
-            // We use linear probing here
-            bucket_index++;
-            bucket_index = bucket_index % capacity_;
+            // Linear probing
+            index = (index + 1) % capacity_;
         }
+    }
+    const Bucket* lookup_for_reading(const T& value) const {
+        lookup_with_hash(TraitsForT::hash(value), [&value](auto& entry) {
+            return TraitsForT::equals(entry, value);
+        });
     }
 
     Bucket& lookup_for_writing(const T& value) {
