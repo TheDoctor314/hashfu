@@ -216,7 +216,11 @@ class HashTable {
     // NOTE: Debug function
     void print() {
         for (size_t i = 0; i < capacity_; ++i) {
-            std::cerr << i << ": " << *buckets_[i].slot() << '\n';
+            auto& bucket = buckets_[i];
+            std::cerr << i << ": " << *bucket.slot();
+            std::cerr << " Used: " << bucket.used;
+            std::cerr << " Deleted: " << bucket.deleted;
+            std::cerr << " End: " << bucket.end << '\n';
         }
     }
 
