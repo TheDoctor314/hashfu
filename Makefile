@@ -22,5 +22,5 @@ $(RUNNER): $(RUNNER).cpp
 		$(CXX) -o $@ $<
 
 # Generate tests_runner.cpp
-$(RUNNER).cpp: $(TEST_DIR)/TestHashTable.h
+$(RUNNER).cpp: $(wildcard $(TEST_DIR)/*.h)
 		cxxtestgen -o $@ --error-printer $^
