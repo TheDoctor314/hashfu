@@ -122,7 +122,7 @@ class HashTable {
     }
 
     template <typename Pred>
-    Bucket* lookup_with_hash(unsigned hash, Pred predicate) {
+    Bucket* lookup_with_hash(unsigned hash, Pred predicate) const {
         if (is_empty()) return nullptr;
 
         auto index = hash % capacity_;
