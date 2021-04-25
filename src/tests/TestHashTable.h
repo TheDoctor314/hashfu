@@ -167,4 +167,35 @@ class TestHashTable : public CxxTest::TestSuite {
 
         TS_ASSERT_EQUALS(strings.capacity(), capacity);
     }
+    void test_contains() {
+        struct TraitsForInt {
+            static unsigned hash(const int& val) {
+                return std::hash<int>{}(val);
+            }
+            static bool equals(const int& a, const int& b) { return a == b; }
+        };
+        HashTable<int, TraitsForInt> table;
+
+        table.insert(1);
+        table.insert(2);
+        table.insert(3);
+
+        TS_ASSERT_EQUALS(table.contains(1), true);
+        TS_ASSERT_EQUALS(table.contains(2), true);
+        TS_ASSERT_EQUALS(table.contains(3), true);
+        TS_ASSERT_EQUALS(table.contains(4), false);
+
+        TS_ASSERT_EQUALS(table.remove(3), true);
+        TS_ASSERT_EQUALS(table.contains(3), false);
+        TS_ASSERT_EQUALS(table.contains(1), true);
+        TS_ASSERT_EQUALS(table.contains(2), true);
+
+        TS_ASSERT_EQUALS(table.remove(2), true);
+        TS_ASSERT_EQUALS(table.contains(2), false);
+        TS_ASSERT_EQUALS(table.contains(3), false);
+        TS_ASSERT_EQUALS(table.contains(1), true);
+
+        TS_ASSERT_EQUALS(table.remove(1), true);
+        TS_ASSERT_EQUALS(table.contains(1), false);
+    }
 };
