@@ -90,10 +90,10 @@ class TestHashTable : public CxxTest::TestSuite {
                          CaseInsensitiveTraits::to_lower("helloworld"));
 
         HashTable<std::string, CaseInsensitiveTraits> strings;
-        TS_ASSERT_EQUALS(strings.insert("hello"),
+        TS_ASSERT_EQUALS(strings.insert("HelloWorld"),
                          HashTableResult::InsertedNewEntry);
 
-        TS_ASSERT_EQUALS(strings.insert("HELLo"),
+        TS_ASSERT_EQUALS(strings.insert("helloworld"),
                          HashTableResult::ReplacedExistingEntry);
         TS_ASSERT_EQUALS(strings.size(), 1u);
     }
