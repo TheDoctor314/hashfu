@@ -76,5 +76,11 @@ class HashMap {
     HashTableResult insert(const K& key, const V& value) {
         return table_.insert({key, value});
     }
+
+    V& operator[](const K& key) {
+        auto it = find(key);
+        if (it == end()) insert(key, V());
+        return find(key)->value;
+    }
 };
 }  // namespace hashfu

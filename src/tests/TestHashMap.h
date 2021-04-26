@@ -133,4 +133,17 @@ class TestHashMap : public CxxTest::TestSuite {
         TS_ASSERT_EQUALS(map.remove(1), true);
         TS_ASSERT_EQUALS(map.contains(1), false);
     }
+    void test_array_subscript() {
+        // testing operator[] overload
+        HashMap<std::string, int, TraitsForString> counts;
+
+        auto word_list = {"this", "not", "this", "bye", "not"};
+        for (const auto& word : word_list) {
+            ++counts[word];
+        }
+
+        TS_ASSERT_EQUALS(counts.find("this")->value, 2);
+        TS_ASSERT_EQUALS(counts.find("not")->value, 2);
+        TS_ASSERT_EQUALS(counts.find("bye")->value, 1);
+    }
 };
