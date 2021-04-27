@@ -4,6 +4,8 @@ TEST_DIR := tests
 
 CFLAGS := -Wall -Wextra -Werror -Wpedantic -g --std=c++17
 
+all: $(EXEC) test
+
 # Final build step
 $(EXEC):	$(SRC_DIR)/main.cpp
 		$(CXX) $(CFLAGS) $< -o $@
@@ -11,6 +13,7 @@ $(EXEC):	$(SRC_DIR)/main.cpp
 .PHONY: clean
 clean:
 		rm $(EXEC)
+		rm $(RUNNER)
 
 RUNNER ?= $(TEST_DIR)/tests_runner
 # Target to run tests
