@@ -1,6 +1,6 @@
 EXEC  ?= main
 SRC_DIR := src
-TEST_DIR := $(SRC_DIR)/tests
+TEST_DIR := tests
 
 CFLAGS := -Wall -Wextra -Werror -Wpedantic -g --std=c++17
 
@@ -19,7 +19,7 @@ test: $(RUNNER)
 
 # Building the tests_runner
 $(RUNNER): $(RUNNER).cpp
-		$(CXX) -o $@ $<
+		$(CXX) -I$(SRC_DIR) -o $@ $<
 
 # Generate tests_runner.cpp
 $(RUNNER).cpp: $(wildcard $(TEST_DIR)/*.h)

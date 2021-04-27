@@ -1,6 +1,6 @@
 #include <cxxtest/TestSuite.h>
 
-#include "../HashMap.h"
+#include "HashMap.h"
 
 using hashfu::HashMap;
 using hashfu::HashTableResult;

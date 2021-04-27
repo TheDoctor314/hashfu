@@ -1,3 +1,4 @@
 .cache
 compile_commands.json
-src/tests/tests_runner*
+**/tests/tests_runner*
+*.vim

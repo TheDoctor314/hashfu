@@ -5,7 +5,7 @@
 #include <functional>
 #include <string>
 
-#include "../HashTable.h"
+#include "HashTable.h"
 
 using hashfu::HashTable;
 using hashfu::HashTableResult;
