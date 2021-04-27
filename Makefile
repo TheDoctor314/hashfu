@@ -4,6 +4,8 @@ TEST_DIR := tests
 
 CFLAGS := -Wall -Wextra -Werror -Wpedantic -g --std=c++17
 
+all: $(EXEC) test
+
 # Final build step
 $(EXEC):	$(SRC_DIR)/main.cpp
 		$(CXX) $(CFLAGS) $< -o $@
