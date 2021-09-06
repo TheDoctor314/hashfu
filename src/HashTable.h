@@ -19,12 +19,15 @@ class HashTableIterator {
 
    public:
     // Basic operator overloads required by any iterator
-    bool operator==(const HashTableIterator& rhs) {
-        return bucket_ == rhs.bucket_;
+    friend bool operator==(const HashTableIterator& lhs,
+                           const HashTableIterator& rhs) {
+        return lhs.bucket_ == rhs.bucket_;
     }
-    bool operator!=(const HashTableIterator& rhs) {
-        return bucket_ != rhs.bucket_;
+    friend bool operator!=(const HashTableIterator& lhs,
+                           const HashTableIterator& rhs) {
+        return lhs.bucket_ != rhs.bucket_;
     }
+
     T& operator*() { return *bucket_->slot(); }
     T* operator->() { return bucket_->slot(); }
 
