@@ -50,9 +50,6 @@ TEST_CASE("range-for loop") {
     REQUIRE(count == 3);
 }
 
-/* Using this test case does not compile - why??
- *
- *
 TEST_CASE("Remove") {
     StringTable strings;
 
@@ -69,7 +66,6 @@ TEST_CASE("Remove") {
     REQUIRE(strings.find("Three") == strings.end());
     REQUIRE(strings.find("Two") != strings.end());
 }
-*/
 
 TEST_CASE("Case-Insensitive") {
     struct CaseInsensitiveTraits {
@@ -113,7 +109,6 @@ TEST_CASE("Fuck ton of strings") {
     REQUIRE(strings.is_empty());
 }
 
-/*
 TEST_CASE("Collisions") {
     // forcing collisions
     struct StringCollisionTraits {
@@ -139,7 +134,6 @@ TEST_CASE("Collisions") {
     REQUIRE(strings.size() == 1);
     REQUIRE(strings.find("foo") != strings.end());
 }
-*/
 
 TEST_CASE("Space reuse") {
     struct StringCollisionTraits {

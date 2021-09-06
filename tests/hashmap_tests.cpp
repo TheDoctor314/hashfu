@@ -55,7 +55,6 @@ TEST_CASE("Range-for loop") {
     REQUIRE(counter == 3);
 }
 
-/*
 TEST_CASE("Remove") {
     IntTable num_to_string;
     REQUIRE(num_to_string.insert(1, "one") ==
@@ -74,7 +73,6 @@ TEST_CASE("Remove") {
     REQUIRE(num_to_string.find(3) == num_to_string.end());
     REQUIRE(num_to_string.find(2) != num_to_string.end());
 }
-*/
 
 TEST_CASE("Case insensitive") {
     struct CaseInsensitiveTraits {
