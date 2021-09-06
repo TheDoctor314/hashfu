@@ -20,7 +20,7 @@ TEST_CASE("Construct") {
 
     auto table = HashTable<int, IntTraits>{};
     REQUIRE(table.size() == 0);
-    REQUIRE(table.is_empty());
+    REQUIRE(table.empty());
 }
 
 TEST_CASE("Populate") {
@@ -30,7 +30,7 @@ TEST_CASE("Populate") {
     strings.insert("Two");
     strings.insert("Three");
 
-    REQUIRE_FALSE(strings.is_empty());
+    REQUIRE_FALSE(strings.empty());
     REQUIRE(strings.size() == 3);
 }
 
@@ -106,7 +106,7 @@ TEST_CASE("Fuck ton of strings") {
         REQUIRE(strings.remove(std::to_string(i)));
     }
 
-    REQUIRE(strings.is_empty());
+    REQUIRE(strings.empty());
 }
 
 TEST_CASE("Collisions") {

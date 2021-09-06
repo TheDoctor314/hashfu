@@ -66,6 +66,14 @@ class HashTable {
         T* slot() { return reinterpret_cast<T*>(storage); }
     };
 
+   public:
+    using key_type = T;
+    using value_type = T;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+
    private:
     Bucket* buckets_{nullptr};
     size_t size_{0};
@@ -138,7 +146,7 @@ class HashTable {
         }
     }
 
-    bool is_empty() const { return size_ == 0; }
+    [[nodiscard]] bool empty() const noexcept { return size_ == 0; }
     size_t size() const { return size_; }
     size_t capacity() const { return capacity_; }
     float load_factor() const {
@@ -148,25 +156,28 @@ class HashTable {
 
     //  Implement iterator functions
     using Iterator = HashTableIterator<HashTable, T, Bucket>;
-    Iterator begin() {
+    Iterator begin() noexcept {
         for (size_t i = 0; i < capacity_; ++i) {
             if (buckets_[i].used) return Iterator(&buckets_[i]);
         }
 
         return end();
     }
-    Iterator end() { return Iterator(nullptr); }
+    Iterator end() noexcept { return Iterator(nullptr); }
 
     using ConstIterator =
         HashTableIterator<const HashTable, const T, const Bucket>;
-    ConstIterator begin() const {
+    ConstIterator begin() const noexcept {
         for (size_t i = 0; i < capacity_; ++i) {
             if (buckets_[i].used) return ConstIterator(&buckets_[i]);
         }
 
         return end();
     }
-    ConstIterator end() const { return ConstIterator(nullptr); }
+    ConstIterator cbegin() const noexcept { return begin(); }
+
+    ConstIterator end() const noexcept { return ConstIterator(nullptr); }
+    ConstIterator cend() const noexcept { return end(); }
 
     void clear() { *this = HashTable(); }
 
@@ -291,7 +302,7 @@ class HashTable {
 
     template <typename Pred>
     Bucket* lookup_with_hash(unsigned hash, Pred predicate) const {
-        if (is_empty()) return nullptr;
+        if (empty()) return nullptr;
 
         auto index = hash % capacity_;
         for (;;) {
