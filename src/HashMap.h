@@ -27,15 +27,18 @@ class HashMap {
    public:
     HashMap() = default;
 
-    bool is_empty() const { return table_.is_empty(); }
+    [[nodiscard]] bool empty() const { return table_.empty(); }
     size_t size() const { return table_.size(); }
     size_t capacity() const { return table_.capacity(); }
     float load_factor() const { return table_.load_factor(); }
 
     void clear() { table_.clear(); }
 
-    ConstIteratorType begin() const { return table_.begin(); }
-    ConstIteratorType end() const { return table_.end(); }
+    ConstIteratorType begin() const noexcept { return table_.begin(); }
+    ConstIteratorType cbegin() const noexcept { return begin(); }
+    ConstIteratorType end() const noexcept { return table_.end(); }
+    ConstIteratorType cend() const noexcept { return end(); }
+
     ConstIteratorType find(const K& key) const {
         return table_.find(KeyTraits::hash(key), [&](auto& entry) {
             return KeyTraits::equals(key, entry.key);
@@ -46,8 +49,8 @@ class HashMap {
         return table_.find(hash, predicate);
     }
 
-    IteratorType begin() { return table_.begin(); }
-    IteratorType end() { return table_.end(); }
+    IteratorType begin() noexcept { return table_.begin(); }
+    IteratorType end() noexcept { return table_.end(); }
     IteratorType find(const K& key) {
         return table_.find(KeyTraits::hash(key), [&](auto& entry) {
             return KeyTraits::equals(key, entry.key);
