@@ -76,13 +76,27 @@ class HashTable {
 
    private:
     Bucket* buckets_{nullptr};
-    size_t size_{0};
-    size_t deleted_count_{0};
-    size_t capacity_{0};
+    size_type size_{0};
+    size_type deleted_count_{0};
+    size_type capacity_{0};
 
    public:
     HashTable() = default;
-    explicit HashTable(size_t capacity) { rehash(capacity); }
+    explicit HashTable(size_type capacity) { rehash(capacity); }
+
+    template <typename InputIt>
+    HashTable(InputIt first, InputIt last, size_type bucket_count = 4) {
+        rehash(bucket_count);
+
+        while (first != last) {
+            insert(*first);
+            ++first;
+        }
+    }
+
+    // delegates to the InputIt constructor
+    HashTable(std::initializer_list<value_type> list)
+        : HashTable(list.begin(), list.end(), list.size()) {}
 
     ~HashTable() {
         if (!buckets_) return;
@@ -128,6 +142,11 @@ class HashTable {
         return *this;
     }
 
+    HashTable& operator=(std::initializer_list<value_type> list) {
+        swap(*this, HashTable(list));
+        return *this;
+    }
+
     void swap(HashTable& a, HashTable& b) noexcept {
         std::swap(a.capacity_, b.capacity_);
         std::swap(a.size_, b.size_);
@@ -147,8 +166,8 @@ class HashTable {
     }
 
     [[nodiscard]] bool empty() const noexcept { return size_ == 0; }
-    size_t size() const { return size_; }
-    size_t capacity() const { return capacity_; }
+    size_type size() const { return size_; }
+    size_type capacity() const { return capacity_; }
     float load_factor() const {
         return static_cast<float>(used_buckets_count()) /
                static_cast<float>(capacity());
@@ -201,11 +220,13 @@ class HashTable {
         });
     }
 
-    bool contains(const T& value) const { return find(value) != end(); }
+    bool contains(const value_type& value) const {
+        return find(value) != end();
+    }
 
     /* TODO: Take a forwarding reference for insert and
      * forward it to the constructor of T*/
-    HashTableResult insert(const T& value) {
+    HashTableResult insert(const value_type& value) {
         auto& bucket = lookup_for_writing(value);
 
         if (bucket.used) {
@@ -249,13 +270,13 @@ class HashTable {
     }
 
    private:
-    size_t used_buckets_count() const { return size_ + deleted_count_; }
+    size_type used_buckets_count() const { return size_ + deleted_count_; }
     bool should_grow() const {
         return ((used_buckets_count() + 1) * 100) >=
                (capacity_ * load_factor_percent);
     }
 
-    void rehash(size_t new_capacity) {
+    void rehash(size_type new_capacity) {
         new_capacity = std::max(new_capacity, static_cast<size_t>(4));
 
         auto old_capacity = capacity_;
