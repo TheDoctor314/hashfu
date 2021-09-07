@@ -24,11 +24,7 @@ TEST_CASE("Construct") {
 }
 
 TEST_CASE("Populate") {
-    StringTable strings;
-
-    strings.insert("One");
-    strings.insert("Two");
-    strings.insert("Three");
+    StringTable strings = {"One", "Two", "Three"};
 
     REQUIRE_FALSE(strings.empty());
     REQUIRE(strings.size() == 3);
@@ -51,11 +47,7 @@ TEST_CASE("range-for loop") {
 }
 
 TEST_CASE("Remove") {
-    StringTable strings;
-
-    REQUIRE(strings.insert("One") == HashTableResult::InsertedNewEntry);
-    REQUIRE(strings.insert("Two") == HashTableResult::InsertedNewEntry);
-    REQUIRE(strings.insert("Three") == HashTableResult::InsertedNewEntry);
+    StringTable strings{"One", "Two", "Three"};
 
     REQUIRE(strings.remove("One"));
     REQUIRE(strings.size() == 2u);
@@ -170,11 +162,7 @@ TEST_CASE("Contains") {
         static unsigned hash(const int& val) { return std::hash<int>{}(val); }
         static bool equals(const int& a, const int& b) { return a == b; }
     };
-    HashTable<int, TraitsForInt> table;
-
-    table.insert(1);
-    table.insert(2);
-    table.insert(3);
+    HashTable<int, TraitsForInt> table{1, 2, 3};
 
     REQUIRE(table.contains(1));
     REQUIRE(table.contains(2));

@@ -23,7 +23,7 @@ using StringTable = HashMap<std::string, int, TraitsForString>;
 
 TEST_CASE("Construct") {
     using IntTable = HashMap<int, int, TraitsForInt>;
-    REQUIRE(IntTable().is_empty());
+    REQUIRE(IntTable().empty());
     REQUIRE(IntTable().size() == 0u);
 }
 
@@ -33,7 +33,7 @@ TEST_CASE("Populate") {
     num_to_string.insert(2, "two");
     num_to_string.insert(3, "three");
 
-    REQUIRE_FALSE(num_to_string.is_empty());
+    REQUIRE_FALSE(num_to_string.empty());
     REQUIRE(num_to_string.size() == 3u);
 }
 
@@ -118,7 +118,7 @@ TEST_CASE("Fuck ton of strings") {
         REQUIRE(strings.remove(std::to_string(i)));
     }
 
-    REQUIRE(strings.is_empty());
+    REQUIRE(strings.empty());
 }
 
 TEST_CASE("Contains") {
